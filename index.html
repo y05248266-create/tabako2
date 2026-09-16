@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>たばこの害と健康を学ぼう！</title>
+  <!-- Tailwind CSS (デザイン・レスポンシブ用ライブラリ) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome (アイコン表示用ライブラリ) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* アニメーションと視覚的効果の追加 */
+    .option-btn {
+      transition: all 0.2s ease-in-out;
+    }
+    .option-btn:hover {
+      transform: translateY(-2px);
+    }
+    .option-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between font-sans pb-12">
+
+  <!-- ヘッダー（タイトルエリア） -->
+  <header class="bg-teal-600 text-white py-4 px-6 shadow-md">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl md:text-3xl font-bold tracking-wide">
+        <i class="fa-solid fa-graduation-cap mr-2"></i>たばこの知識クイズ
+      </h1>
+      <span class="text-sm md:text-base bg-teal-700 px-3 py-1 rounded-full border border-teal-500">中学2年 保健・技術</span>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="max-w-3xl mx-auto w-full px-4 py-6 flex-grow flex flex-col justify-center">
+
+    <!-- 1. スタート画面 -->
+    <div id="start-screen" class="bg-white rounded-2xl p-6 md:p-10 shadow-lg text-center border-t-8 border-teal-500">
+      <div class="text-teal-600 text-5xl mb-4">
+        <i class="fa-solid fa-notes-medical"></i>
+      </div>
+      <h2 class="text-2xl md:text-3xl font-bold mb-4">たばこについて学ぼう！</h2>
+      <p class="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
+        全5問のクイズです。<br>自分の健康や周りの人の健康を守るための正しい知識を身につけましょう。
+      </p>
+      <button onclick="startQuiz()" class="w-full md:w-2/3 bg-teal-500 hover:bg-teal-600 text-white text-xl md:text-2xl font-bold py-4 px-8 rounded-xl shadow-md transition duration-200">
+        クイズを始める <i class="fa-solid fa-arrow-right ml-2"></i>
+      </button>
+    </div>
+
+    <!-- 2. クイズ画面（初期は非表示） -->
+    <div id="quiz-screen" class="hidden bg-white rounded-2xl p-6 md:p-8 shadow-lg border-t-8 border-teal-500">
+      <!-- 進捗バー -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <span id="question-number" class="text-lg md:text-xl font-bold text-teal-600">第 1 問 / 5問</span>
+          <span id="score-count" class="text-base md:text-lg text-gray-500 font-semibold">現在の正解数: 0</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div id="progress-bar" class="bg-teal-500 h-3 rounded-full transition-all duration-300" style="width: 20%"></div>
+        </div>
+      </div>
+
+      <!-- 問題文 -->
+      <div class="bg-slate-50 p-5 rounded-xl mb-6 border border-slate-200">
+        <h3 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-snug">
+          ここに問題文が入ります
+        </h3>
+      </div>
+
+      <!-- 選択肢ボタン群 -->
+      <div id="options-container" class="grid grid-cols-1 gap-4 mb-6">
+        <!-- JSで動的にボタンが生成されます -->
+      </div>
+
+      <!-- 解説表示エリア（回答後に表示） -->
+      <div id="explanation-box" class="hidden p-5 rounded-xl border-2 mb-6">
+        <div id="result-badge" class="text-2xl font-bold mb-2 flex items-center gap-2"></div>
+        <p id="explanation-text" class="text-lg text-slate-700 leading-relaxed"></p>
+        <button id="next-btn" onclick="nextQuestion()" class="mt-4 w-full bg-teal-600 hover:bg-teal-700 text-white text-lg font-bold py-3 px-6 rounded-lg transition duration-200 flex justify-center items-center gap-2">
+          次の問題へ <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. 結果画面（初期は非表示） -->
+    <div id="result-screen" class="hidden bg-white rounded-2xl p-6 md:p-10 shadow-lg text-center border-t-8 border-teal-500">
+      <div id="result-icon" class="text-6xl mb-4"></div>
+      <h2 class="text-2xl md:text-3xl font-bold mb-2">クイズ終了！</h2>
+      <p class="text-lg text-gray-600 mb-6">おつかれさまでした。あなたの結果は…</p>
+
+      <div class="bg-teal-50 border border-teal-200 rounded-2xl p-6 mb-8 max-w-sm mx-auto">
+        <span class="text-gray-500 font-semibold block mb-1">スコア</span>
+        <span id="final-score" class="text-4xl md:text-5xl font-black text-teal-600">5 / 5 問</span>
+      </div>
+
+      <div id="result-message" class="text-xl font-bold mb-8 text-slate-700"></div>
+
+      <button onclick="restartQuiz()" class="w-full md:w-2/3 bg-teal-500 hover:bg-teal-600 text-white text-xl font-bold py-4 px-8 rounded-xl shadow-md transition duration-200">
+        もう一度挑戦する <i class="fa-solid fa-rotate-right ml-2"></i>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- 常時表示の著作権表示（画面右下固定・指定要件） -->
+  <footer class="fixed bottom-2 right-2 bg-slate-800/80 text-white text-xs md:text-sm px-3 py-1.5 rounded-lg shadow-lg backdrop-blur-sm z-50 pointer-events-none">
+    ©2026 鈴木
+  </footer>
+
+  <script>
+    /******************************************************************
+     * 【教員向け】問題データの編集エリア
+     * ここを変更・追加することでクイズの内容を簡単に修正できます。
+     ******************************************************************/
+    const quizData = [
+      {
+        question: "たばこの煙に含まれる有害物質の数は、およそどれくらいでしょう？",
+        options: [
+          "約 20 種類",
+          "約 200 種類",
+          "約 5,300 種類（有害物質は約250種）",
+          "約 70 種類"
+        ],
+        answer: 2, // 0から数えて3番目が正解（0: 20種類, 1: 200種類, 2: 5300種類...）
+        explanation: "たばこの煙には5,300種類以上の化学物質が含まれ、そのうち約250種類が有害物質、約70種類が発がん性物質です。"
+      },
+      {
+        question: "たばこに含まれ、吸うのをやめられなくなる「強い依存性（依存症）」を引き起こす物質はどれでしょう？",
+        options: [
+          "ニコチン",
+          "タール",
+          "一酸化炭素",
+          "ビタミンC"
+        ],
+        answer: 0,
+        explanation: "「ニコチン」には強い依存性があります。自分の意志だけでは禁煙が難しくなる主な原因です。"
+      },
+      {
+        question: "自分はたばこを吸わなくても、他人が吸っている煙を吸い込んでしまうことを何というでしょう？",
+        options: [
+          "直接喫煙",
+          "受動喫煙",
+          "再利用喫煙",
+          "自然吸気"
+        ],
+        answer: 1,
+        explanation: "他人の煙を吸い込むことを「受動喫煙」といいます。副流煙には主流煙よりも多くの有害物質が含まれる場合があります。"
+      },
+      {
+        question: "日本の法律（20歳未満の者の喫煙の禁止に関する法律）で、喫煙が禁止されているのは何歳未満でしょう？",
+        options: [
+          "18歳未満",
+          "20歳未満",
+          "22歳未満",
+          "25歳未満"
+        ],
+        answer: 1,
+        explanation: "日本では「20歳未満」の喫煙が禁止されています。成長期の身体はたばこの悪影響を受けやすいためです。"
+      },
+      {
+        question: "「加熱式タバコ」に関する記述として、正しいものはどれでしょう？",
+        options: [
+          "ニコチンや有害物質はまったく含まれていない",
+          "有害物質は含まれるため、健康への影響や依存性のリスクがある",
+          "20歳未満でも吸って良い",
+          "受動喫煙の危険性は完全にゼロである"
+        ],
+        answer: 1,
+        explanation: "加熱式タバコも紙巻たばこ同様にニコチンや有害物質が含まれており、健康被害や依存のリスクが存在します。"
+      }
+    ];
+
+    /******************************************************************
+     * アプリケーションのプログラム処理（JavaScript）
+     ******************************************************************/
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    // DOM要素の取得
+    const startScreen = document.getElementById("start-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
+    const questionNumberEl = document.getElementById("question-number");
+    const scoreCountEl = document.getElementById("score-count");
+    const progressBar = document.getElementById("progress-bar");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    const explanationBox = document.getElementById("explanation-box");
+    const resultBadge = document.getElementById("result-badge");
+    const explanationText = document.getElementById("explanation-text");
+
+    // クイズ開始
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      startScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+      showQuestion();
+    }
+
+    // 問題を表示
+    function showQuestion() {
+      answered = false;
+      explanationBox.classList.add("hidden");
+
+      const currentQuiz = quizData[currentQuestionIndex];
+
+      // 進捗表示の更新
+      questionNumberEl.textContent = `第 ${currentQuestionIndex + 1} 問 / ${quizData.length}問`;
+      scoreCountEl.textContent = `現在の正解数: ${score}`;
+      const progressPercent = ((currentQuestionIndex + 1) / quizData.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+
+      // 問題文の更新
+      questionTextEl.textContent = currentQuiz.question;
+
+      // 選択肢ボタンの生成
+      optionsContainer.innerHTML = "";
+      currentQuiz.options.forEach((optionText, index) => {
+        const button = document.createElement("button");
+        button.className = "option-btn w-full bg-white hover:bg-slate-50 border-2 border-slate-300 rounded-xl p-4 md:p-5 text-left text-lg md:text-xl font-medium text-slate-700 flex items-center justify-between shadow-sm";
+        button.innerHTML = `
+          <span>${index + 1}. ${optionText}</span>
+          <i class="fa-regular fa-circle text-gray-300"></i>
+        `;
+        button.onclick = () => selectOption(index);
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    // 選択肢をクリックした時の処理
+    function selectOption(selectedIndex) {
+      if (answered) return; // 二重クリック防止
+      answered = true;
+
+      const currentQuiz = quizData[currentQuestionIndex];
+      const isCorrect = selectedIndex === currentQuiz.answer;
+      const buttons = optionsContainer.children;
+
+      // 全ボタンを無効化し、スタイル変更
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+        buttons[i].classList.remove("hover:bg-slate-50");
+
+        if (i === currentQuiz.answer) {
+          // 正解のボタン
+          buttons[i].classList.add("border-green-500", "bg-green-50", "text-green-800");
+          buttons[i].querySelector("i").className = "fa-solid fa-circle-check text-green-500 text-2xl";
+        } else if (i === selectedIndex && !isCorrect) {
+          // 間違えて選んだボタン
+          buttons[i].classList.add("border-red-500", "bg-red-50", "text-red-800");
+          buttons[i].querySelector("i").className = "fa-solid fa-circle-xmark text-red-500 text-2xl";
+        } else {
+          // 選ばれなかった不正解ボタン
+          buttons[i].classList.add("opacity-50");
+        }
+      }
+
+      // 判定と解説の表示
+      if (isCorrect) {
+        score++;
+        scoreCountEl.textContent = `現在の正解数: ${score}`;
+        resultBadge.className = "text-2xl font-bold mb-2 flex items-center gap-2 text-green-600";
+        resultBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> 正解！';
+        explanationBox.className = "p-5 rounded-xl border-2 mb-6 bg-green-50 border-green-200";
+      } else {
+        resultBadge.className = "text-2xl font-bold mb-2 flex items-center gap-2 text-red-600";
+        resultBadge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> 残念…不正解';
+        explanationBox.className = "p-5 rounded-xl border-2 mb-6 bg-red-50 border-red-200";
+      }
+
+      explanationText.textContent = currentQuiz.explanation;
+      explanationBox.classList.remove("hidden");
+    }
+
+    // 次の問題へすすむ
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < quizData.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    // 結果画面を表示
+    function showResult() {
+      quizScreen.classList.add("hidden");
+      resultScreen.classList.remove("hidden");
+
+      document.getElementById("final-score").textContent = `${score} / ${quizData.length} 問`;
+
+      const resultIcon = document.getElementById("result-icon");
+      const resultMessage = document.getElementById("result-message");
+
+      if (score === quizData.length) {
+        resultIcon.className = "text-6xl mb-4 text-yellow-500";
+        resultIcon.innerHTML = '<i class="fa-solid fa-award"></i>';
+        resultMessage.textContent = "素晴らしい！全問正解です。たばこの知識はバッチリですね！";
+      } else if (score >= 3) {
+        resultIcon.className = "text-6xl mb-4 text-teal-500";
+        resultIcon.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
+        resultMessage.textContent = "お見事！よく理解できています。あともう一息で満点です。";
+      } else {
+        resultIcon.className = "text-6xl mb-4 text-blue-500";
+        resultIcon.innerHTML = '<i class="fa-solid fa-book-open"></i>';
+        resultMessage.textContent = "おつかれさまでした。解説を読んでしっかり復習してみましょう！";
+      }
+    }
+
+    // クイズをリセットして最初に戻る
+    function restartQuiz() {
+      startQuiz();
+    }
+  </script>
+</body>
+</html>
